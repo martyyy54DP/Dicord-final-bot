@@ -1,0 +1,96 @@
+import discord
+import requests
+import os
+import random
+from discord.ext import commands
+
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+
+@bot.command()
+async def quien_eres(ctx):
+    await ctx.send(f'Soy un bot {bot.user}!')
+
+def get_duck_image_url():    
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+@bot.command('ducks')
+async def duck(ctx):
+    '''Una vez que llamamos al comando duck, 
+    el programa llama a la función get_duck_image_url'''
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
+
+
+@bot.command()
+async def meme(ctx):
+    lista_imagenes = os.listdir('memes')
+    imagen_seleccionada = random.choice(lista_imagenes)
+    with open(f'memes/{imagen_seleccionada}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+@bot.command()
+async def programacion(ctx):
+    lista_imagenes = os.listdir('images')
+    imagen_seleccionada = random.choice(lista_imagenes)
+    with open(f'images/{imagen_seleccionada}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+@bot.command()
+async def imagenes(ctx):
+    lista_imagenes = os.listdir('memes')
+    imagen_seleccionada = random.choice(lista_imagenes)
+    with open(f'imagenes/{imagen_seleccionada}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+@bot.command()
+async def juegos(ctx):
+    lista_imagenes = os.listdir('memes')
+    imagen_seleccionada = random.choice(lista_imagenes)
+    with open(f'games/{imagen_seleccionada}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+@bot.command()
+async def animales(ctx):
+    lista_imagenes = os.listdir('animals')  # Asegúrate de listar la carpeta 'animals'
+    imagen_seleccionada = random.choice(lista_imagenes)
+    with open(f'animals/{imagen_seleccionada}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+
+@bot.command('imagen')
+async def imagen(ctx):
+    try:
+        lista_imagenes = os.listdir('imagenes')  # Asegúrate de que esta carpeta exista
+        if not lista_imagenes:
+            await ctx.send("No hay imágenes en la carpeta 'imagenes'.")
+            return
+        imagen_seleccionada = random.choice(lista_imagenes)
+        file_path = f'imagenes/{imagen_seleccionada}'
+        if not os.path.isfile(file_path):
+            await ctx.send(f"El archivo '{imagen_seleccionada}' no se encuentra en la carpeta 'imagenes'.")
+            return
+        with open(file_path, 'rb') as f:
+            picture = discord.File(f)
+        await ctx.send(file=picture)
+    except FileNotFoundError:
+        await ctx.send("No se encontró la carpeta 'imagenes'.")
+    except Exception as e:
+        await ctx.send(f"Error al enviar la imagen: {e}")
+
+
+
+bot.run("Token")
